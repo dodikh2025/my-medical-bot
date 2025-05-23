@@ -1,5 +1,4 @@
 import streamlit as st
-import openai
 import requests
 import json
 from datetime import datetime
@@ -7,7 +6,7 @@ import time
 
 # Configure the page
 st.set_page_config(
-    page_title="DFY Bot Assistant",
+    page_title="Medical Defybot",
     page_icon="🤖",
     layout="wide"
 )
@@ -21,15 +20,31 @@ if 'api_key' not in st.session_state:
 class DFYBot:
     def __init__(self, api_key):
         self.api_key = api_key
-        # If using OpenAI API
-        openai.api_key = api_key
         
     def chat_with_bot(self, message, conversation_history=None):
         """
         Send message to DFY bot and get response
         """
         try:
-            # Method 1: Using OpenAI API (if your bot uses OpenAI)
+            # Method 1: Using OpenAI API directly with requests
+            return self.openai_api_call(message, conversation_history)
+            
+        except Exception as e:
+            # Method 2: Custom API endpoint fallback
+            return self.custom_api_call(message, conversation_history)
+    
+    def openai_api_call(self, message, conversation_history=None):
+        """
+        Direct OpenAI API call using requests
+        """
+        try:
+            url = "https://api.openai.com/v1/chat/completions"
+            
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+            
             messages = [
                 {"role": "system", "content": "You are a helpful DFY (Done For You) assistant that helps users with various tasks and questions."}
             ]
@@ -42,18 +57,27 @@ class DFYBot:
             # Add current message
             messages.append({"role": "user", "content": message})
             
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",  # or gpt-4 if available
-                messages=messages,
-                max_tokens=1000,
-                temperature=0.7
-            )
+            payload = {
+                "model": "gpt-3.5-turbo",
+                "messages": messages,
+                "max_tokens": 1000,
+                "temperature": 0.7
+            }
             
-            return response.choices[0].message.content
+            response = requests.post(url, headers=headers, json=payload, timeout=30)
             
+            if response.status_code == 200:
+                data = response.json()
+                return data['choices'][0]['message']['content']
+            else:
+                error_data = response.json() if response.headers.get('content-type') == 'application/json' else {}
+                error_msg = error_data.get('error', {}).get('message', f"API Error: {response.status_code}")
+                return f"OpenAI API Error: {error_msg}"
+                
+        except requests.exceptions.RequestException as e:
+            return f"Connection error: {str(e)}"
         except Exception as e:
-            # Method 2: Custom API endpoint (uncomment and modify if needed)
-            return self.custom_api_call(message, conversation_history)
+            return f"Error: {str(e)}"
     
     def custom_api_call(self, message, conversation_history=None):
         """
