@@ -4,12 +4,12 @@ import json
 from datetime import datetime
 
 # Configuration
-DIFY_API_KEY = "app-ZSuN7aogNY7G9OdIq10sW6Sd"
+DIFY_API_KEY = "app-N2rqhiYbVvY73Wnvf9FOmULU"
 DIFY_API_URL = "https://api.dify.ai/v1/chat-messages"
 
 # Page configuration
 st.set_page_config(
-    page_title="Dify AI Assistant",
+    page_title="German learning Bot",
     page_icon="🤖",
     layout="wide"
 )
