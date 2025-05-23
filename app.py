@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 # Configuration
-DIFY_API_KEY = "app-nBkI63qeFoHR4urOdmX3ej5S"
+DIFY_API_KEY = "app-bW8By7Yyh0uj5fBGiRTJwt7m"
 DIFY_API_URL = "https://api.dify.ai/v1/chat-messages"
 
 # Page configuration
