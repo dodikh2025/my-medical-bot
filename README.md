@@ -1,1 +1,1 @@
-# my-medical-bot
+German bot
